@@ -31,13 +31,13 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     srand(time(NULL));
-    puts("Brojevi u kombinaciji ce biti uvek poredjana po velicini.\n");
+    puts("Brojevi u kombinaciji ce biti uvek poredjanani po velicini.\n");
     for(i = 0; i < broj_cifara; i++)
         *(tacna_kombinacija + i) = rand() % 6 + 1;
     poredjaj(broj_cifara, tacna_kombinacija);
     printf("Broj pokusaja: %d\n", max_pokusaja);
     printf("\n");
-    for(i = 0; (potrefio != true) && (i <= max_pokusaja); i++) {
+    for(i = 1; (potrefio != true) && (i <= max_pokusaja); i++) {
         na_mestu = 0;
         printf("Unesi kombinaciju: ");
         for(ii = 0; ii < broj_cifara; ii++)
