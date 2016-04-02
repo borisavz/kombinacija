@@ -6,8 +6,8 @@
 void poredjaj(int, int *);
 int main(int argc, char *argv[]) {
     int i, ii, iii, broj_cifara = 4, max_pokusaja = 10, na_mestu,
-        *kombinacija, *tacna_kombinacija;
-    bool potrefio = false, tesko = false;
+        na_pogresnom_mestu, *kombinacija, *tacna_kombinacija;
+    bool potrefio = false, tesko = false, *preskoci1, *preskoci2;
     char c;
     while((c = getopt(argc, argv, "c:p:lth")) != -1)
         switch(c) {
@@ -28,12 +28,15 @@ int main(int argc, char *argv[]) {
                 puts("-p [broj] promeni dozvoljeni broj pokusaja");
                 puts("-l podesi tezinu na lagano (brojevi su poredjani)");
                 puts("-t podesi tezinu na tesko (brojevi nisu poredjani)\n");
+                bgetc();
                 exit(0);
                 break;
         }
     kombinacija = malloc(broj_cifara * sizeof(int));
     tacna_kombinacija = malloc(broj_cifara * sizeof(int));
-    if((kombinacija == NULL) || (tacna_kombinacija == NULL)) {
+    preskoci1 = malloc(broj_cifara * sizeof(bool));
+    preskoci2 = malloc(broj_cifara * sizeof(bool));
+    if((kombinacija == NULL) || (tacna_kombinacija == NULL) || (preskoci1 == NULL) || (preskoci2 == NULL)) {
         perror("Greska: ");
         bgetc();
         exit(1);
@@ -51,17 +54,28 @@ int main(int argc, char *argv[]) {
     printf("\n");
     for(i = 1; (potrefio != true) && (i <= max_pokusaja); i++) {
         na_mestu = 0;
+        na_pogresnom_mestu = 0;
         printf("Unesi kombinaciju: ");
         for(ii = 0; ii < broj_cifara; ii++)
             scanf("%d", kombinacija + ii);
         if(tesko == false)
             poredjaj(broj_cifara, kombinacija);
         for(ii = 0; ii < broj_cifara; ii++)
-            if(*(kombinacija + ii) == *(tacna_kombinacija+ ii))
+            if(*(kombinacija + ii) == *(tacna_kombinacija+ ii)) {
                 na_mestu++;
+                *(preskoci1 + ii) = true;
+                *(preskoci2 + ii) = true;
+            }
+        for(ii = 0; ii < broj_cifara; ii++)
+            for(iii = 0; iii < broj_cifara; iii++)
+                if((*(preskoci1 + ii) == false) && (*(preskoci2 + iii) == false) && (*(kombinacija + ii) == *(tacna_kombinacija + iii))) {
+                    na_pogresnom_mestu++;
+                    *(preskoci1 + ii) = true;
+                    *(preskoci2 + iii) = true;
+                }
         if(na_mestu == broj_cifara)
             potrefio = true;
-        printf("Na mestu: %d Ostalo pokusaja: %d\n\n", na_mestu, max_pokusaja - i);
+        printf("Na mestu: %d Na pogresnom mestu: %d Ostalo pokusaja: %d\n\n", na_mestu, na_pogresnom_mestu, max_pokusaja - i);
     }
     if(potrefio == true)
         puts("\nBravo!");
@@ -73,8 +87,9 @@ int main(int argc, char *argv[]) {
     }
     free(kombinacija);
     free(tacna_kombinacija);
-    fseek(stdin, 0, SEEK_END);
-    getchar();
+    free(preskoci1);
+    free(preskoci2);
+    bgetc();
     return 0;
 }
 void poredjaj(int duzina_niza, int *niz) {
@@ -91,3 +106,9 @@ void poredjaj(int duzina_niza, int *niz) {
             }
     }
 }
+/*
+int bgetc() {
+    fseek(stdin, 0, SEEK_END);
+    return getchar();
+}
+*/
