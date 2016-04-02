@@ -7,9 +7,9 @@ void poredjaj(int, int *);
 int main(int argc, char *argv[]) {
     int i, ii, iii, broj_cifara = 4, max_pokusaja = 10, na_mestu,
         *kombinacija, *tacna_kombinacija;
-    bool potrefio = false;
+    bool potrefio = false, tesko = false;
     char c;
-    while((c = getopt(argc, argv, "c:p:h")) != -1)
+    while((c = getopt(argc, argv, "c:p:lth")) != -1)
         switch(c) {
             case 'c':
                 broj_cifara = atoi(optarg);
@@ -17,9 +17,17 @@ int main(int argc, char *argv[]) {
             case 'p':
                 max_pokusaja = atoi(optarg);
                 break;
+            case 'l':
+                tesko = false;
+                break;
+            case 't':
+                tesko = true;
+                break;
             case 'h':
                 puts("-c [broj] promeni broj cifara u kombinaciji");
-                puts("-p [broj] promeni dozvoljeni broj pokusaja\n");
+                puts("-p [broj] promeni dozvoljeni broj pokusaja");
+                puts("-l podesi tezinu na lagano (brojevi su poredjani)");
+                puts("-t podesi tezinu na tesko (brojevi nisu poredjani)\n");
                 exit(0);
                 break;
         }
@@ -31,10 +39,14 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     srand(time(NULL));
-    puts("Brojevi u kombinaciji ce biti uvek poredjanani po velicini.\n");
     for(i = 0; i < broj_cifara; i++)
         *(tacna_kombinacija + i) = rand() % 6 + 1;
-    poredjaj(broj_cifara, tacna_kombinacija);
+    if(tesko == true)
+        puts("Tezina: tesko\n");
+    else {
+        puts("Tezina: lagano\nBrojevi u kombinaciji su poredjani po velicini");
+        poredjaj(broj_cifara, tacna_kombinacija);
+    }
     printf("Broj pokusaja: %d\n", max_pokusaja);
     printf("\n");
     for(i = 1; (potrefio != true) && (i <= max_pokusaja); i++) {
@@ -42,7 +54,8 @@ int main(int argc, char *argv[]) {
         printf("Unesi kombinaciju: ");
         for(ii = 0; ii < broj_cifara; ii++)
             scanf("%d", kombinacija + ii);
-        poredjaj(broj_cifara, kombinacija);
+        if(tesko == false)
+            poredjaj(broj_cifara, kombinacija);
         for(ii = 0; ii < broj_cifara; ii++)
             if(*(kombinacija + ii) == *(tacna_kombinacija+ ii))
                 na_mestu++;
@@ -60,7 +73,8 @@ int main(int argc, char *argv[]) {
     }
     free(kombinacija);
     free(tacna_kombinacija);
-    bgetc();
+    fseek(stdin, 0, SEEK_END);
+    getchar();
     return 0;
 }
 void poredjaj(int duzina_niza, int *niz) {
