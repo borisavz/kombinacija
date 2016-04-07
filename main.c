@@ -6,7 +6,7 @@
 #include <time.h>
 void poredjaj(int, int *);
 int main(int argc, char *argv[]) {
-    int i, ii, iii, broj_cifara = 4, max_pokusaja = 10, na_mestu,
+    int i, ii, broj_cifara = 4, max_pokusaja = 10, na_mestu,
         *kombinacija, *tacna_kombinacija;
     bool potrefio = false, tesko = false;
     char c;
@@ -69,6 +69,11 @@ int main(int argc, char *argv[]) {
     }
     free(kombinacija);
     free(tacna_kombinacija);
+    puts("Ces jos jednom? y/n");
+    getchar();
+    scanf("%c", &c);
+    if(tolower(c) == 'y')
+        main(argc, argv);
     bgetc();
     return 0;
 }
