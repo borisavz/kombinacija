@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
                 puts("-p [broj] promeni dozvoljeni broj pokusaja");
                 puts("-l podesi tezinu na lagano (brojevi su poredjani)");
                 puts("-t podesi tezinu na tesko (brojevi nisu poredjani)\n");
-                bgetc();
+                getchar();
                 exit(0);
                 break;
         }
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
         if(tesko == false)
             poredjaj(broj_cifara, kombinacija);
         for(ii = 0; ii < broj_cifara; ii++)
-            if(*(kombinacija + ii) == *(tacna_kombinacija+ ii))
+            if(*(kombinacija + ii) == *(tacna_kombinacija + ii))
                 na_mestu++;
         if(na_mestu == broj_cifara)
             potrefio = true;
@@ -74,7 +74,6 @@ int main(int argc, char *argv[]) {
     scanf("%c", &c);
     if(tolower(c) == 'y')
         main(argc, argv);
-    bgetc();
     return 0;
 }
 void poredjaj(int duzina_niza, int *niz) {
@@ -91,9 +90,3 @@ void poredjaj(int duzina_niza, int *niz) {
             }
     }
 }
-/*
-int bgetc() {
-    fseek(stdin, 0, SEEK_END);
-    return getchar();
-}
-*/
