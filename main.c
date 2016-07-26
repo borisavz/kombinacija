@@ -17,16 +17,16 @@ int main(int argc, char *argv[]) {
     while((i = getopt(argc, argv, "c:p:t:z:m:n:h")) != -1)
         switch(i) {
             case 'c':
-                broj_cifara = atoi(optarg);
+                broj_cifara = (ii = atoi(optarg)) > 1 ? ii : 4;
                 break;
             case 'p':
-                max_pokusaja = atoi(optarg);
+                max_pokusaja = (ii = atoi(optarg)) >= 1 ? ii : 10;
                 break;
             case 't':
                 tesko = optarg[0];
                 break;
             case 'z':
-                broj_znakova = atoi(optarg);
+                broj_znakova = (ii = atoi(optarg)) > 1 ? ii : 6;
                 break;
             case 'm':
                 na_mestu_znak = optarg[0];
@@ -35,14 +35,16 @@ int main(int argc, char *argv[]) {
                 na_pogresnom_mestu_znak = optarg[0];
                 break;
             case 'h':
-                puts("-c [broj] podesi broj cifara u kombinaciji\n"
-                    "-p [broj] podesi dozvoljeni broj pokusaja\n"
-                    "-z [broj] podesi broj razlicitih znakova u kombinaciji\n"
+                printf("-c [broj] podesi broj cifara u kombinaciji (2 - %d)\n"
+                    "-p [broj] podesi dozvoljeni broj pokusaja (1 - %d)\n"
+                    "-z [broj] podesi broj razlicitih znakova u kombinaciji (2 - %d)\n"
                     "-m [znak] podesi znak koji predstavlja broj na mestu\n"
                     "-n [znak] podesi znak koji predstavlja broj na pogresnom mestu\n"
                     "-t [broj] podesi tezinu na:\n"
                     "\t0 - lako (redosled je nebitan)\n"
-                    "\t1 - tesko (redosled je bitan)\n");
+                    "\t1 - tesko (redosled je bitan)\n\n"
+                    "Ukoliko je unesena besmislena vrednost koristice se podrazumevana.\n",
+                    INT_MAX, INT_MAX, INT_MAX);
                 getch();
                 return 0;
         }
