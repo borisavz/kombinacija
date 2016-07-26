@@ -6,13 +6,14 @@
 #include <time.h>
 #include <conio.h>
 #include <string.h>
+#include <limits.h>
 #define IZLAZ 0
 #define POTREFIO -1
 int main(int argc, char *argv[]) {
     int i, ii, iii, cifra, duzina = 0, broj_cifara = 4, broj_znakova = 6, max_pokusaja = 10,
         na_mestu, na_pogresnom_mestu, *kombinacija, *tacna_kombinacija;
     bool tesko = false, *preskoci1, *preskoci2, brise;
-    char na_mestu_znak = '*', na_pogresnom_mestu_znak = '.', broj[6];
+    char na_mestu_znak = '*', na_pogresnom_mestu_znak = '.', broj[11];
     while((i = getopt(argc, argv, "c:p:t:z:m:n:h")) != -1)
         switch(i) {
             case 'c':
@@ -36,7 +37,7 @@ int main(int argc, char *argv[]) {
             case 'h':
                 puts("-c [broj] podesi broj cifara u kombinaciji\n"
                     "-p [broj] podesi dozvoljeni broj pokusaja\n"
-                    "-z [broj] podesi broj razlicitih znakova u kombinaciji (1 - 9)\n"
+                    "-z [broj] podesi broj razlicitih znakova u kombinaciji\n"
                     "-m [znak] podesi znak koji predstavlja broj na mestu\n"
                     "-n [znak] podesi znak koji predstavlja broj na pogresnom mestu\n"
                     "-t [broj] podesi tezinu na:\n"
@@ -60,10 +61,9 @@ int main(int argc, char *argv[]) {
     printf("Koristi -h zastavicu pri pokretanju za pomoc.\n"
         "Pritisni 0 da prekines\n"
         "Tezina: %s\n"
-        "Kombinaciju mogu ciniti brojevi od 1 do %d\n", tesko ? "tesko" : "lako", broj_znakova);
-    i = 1;
-    POCETAK:
-    for(; i <= max_pokusaja && i != IZLAZ; i++) {
+        "Kombinaciju mogu ciniti brojevi od 1 do %d\n"
+        "Broj pokusaja: %d\n", tesko ? "tesko" : "lako", broj_znakova, max_pokusaja);
+    for(i = 1; i <= max_pokusaja; i++) {
         na_mestu = na_pogresnom_mestu = 0;
         ii = broj_cifara;
         while(ii--)
@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
                             putchar('\a');
                     continue;
                 }
-                if(iii > 5) {
+                if(iii > 9) {
                     putchar('\a');
                     continue;
                 }
@@ -111,10 +111,9 @@ int main(int argc, char *argv[]) {
                 fputs("\nDa li zelite da izadjete? y/n", stdout);
                 while((cifra = getch()) != 'y' && cifra != 'n')
                     putchar('\a');
-                if(cifra == 'y') {
-                    i = IZLAZ;
-                    goto POCETAK;
-                } else
+                if(cifra == 'y')
+                    goto KRAJ;
+                else
                     goto UNESI;
             }
         }
@@ -138,6 +137,7 @@ int main(int argc, char *argv[]) {
             break;
         }
     }
+    KRAJ:
     puts("\n-----");
     if(i == POTREFIO)
         puts("Bravo!");
