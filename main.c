@@ -8,11 +8,14 @@
 #include <string.h>
 #include <limits.h>
 #define IZLAZ 0
+#define PRESKOCI -1
 int main(int argc, char *argv[]) {
-    int i, ii, iii, cifra, duzina = 0, broj_cifara = 4, broj_znakova = 6, max_pokusaja = 10,
-        na_mestu, na_pogresnom_mestu, *kombinacija, *tacna_kombinacija, trenutna_cifra;
-    bool tesko = false, *preskoci1, *preskoci2, brise;
+    int i, ii, iii, cifra, duzina = 0, duzina_broja = 0, broj_cifara = 4, broj_znakova = 6,
+        max_pokusaja = 10, na_mestu, na_pogresnom_mestu, *kombinacija, *tacna_kombinacija,
+        trenutna_cifra;
+    bool tesko = false, *preskoci, brise;
     char na_mestu_znak = '*', na_pogresnom_mestu_znak = '.', broj[11];
+    size_t kombinacija_velicina;
     while((i = getopt(argc, argv, "c:p:t:z:m:n:h")) != -1)
         switch(i) {
             case 'c':
@@ -50,25 +53,27 @@ int main(int argc, char *argv[]) {
     if(!tesko)
         na_pogresnom_mestu_znak = na_mestu_znak;
     for(i = max_pokusaja; i; i /= 10)
-      duzina++;
-    kombinacija = malloc(broj_cifara * sizeof(int));
-    tacna_kombinacija = malloc(broj_cifara * sizeof(int));
-    preskoci1 = malloc(broj_cifara * sizeof(bool));
-    preskoci2 = malloc(broj_cifara * sizeof(bool));
+        duzina++;
+    for(i = broj_cifara; i; i /= 10)
+        duzina_broja++;
+    kombinacija_velicina = broj_cifara * sizeof(int);
+    kombinacija = malloc(kombinacija_velicina);
+    tacna_kombinacija = malloc(kombinacija_velicina);
+    preskoci = malloc(broj_cifara * sizeof(bool));
     srand(time(NULL));
     i = broj_cifara;
     while(i--)
         tacna_kombinacija[i] = rand() % broj_znakova + 1;
     printf("Koristi -h zastavicu pri pokretanju za pomoc.\n"
-        "Pritisni 0 da prekines\n"
+        "Pritisni 0 da prekines.\n\n"
         "Tezina: %s\n"
-        "Kombinaciju mogu ciniti brojevi od 1 do %d\n"
+        "Kombinaciju mogu ciniti brojevi od 1 do %d.\n"
         "Broj pokusaja: %d\n", tesko ? "tesko" : "lako", broj_znakova, max_pokusaja);
     for(i = 1; i <= max_pokusaja; i++) {
         trenutna_cifra = na_mestu = na_pogresnom_mestu = 0;
         ii = broj_cifara;
         while(ii--)
-            preskoci1[ii] = preskoci2[ii] = false;
+            preskoci[ii] = false;
         putchar('\n');
         UNESI:
         printf("\r#%*d |", duzina, i);
@@ -78,6 +83,7 @@ int main(int argc, char *argv[]) {
         while(trenutna_cifra < broj_cifara) {
             ii = 0;
             while(true) {
+                CITAJ_ZNAK:
                 if((cifra = getch()) == '\r') {
                     if(ii)
                         break;
@@ -86,7 +92,7 @@ int main(int argc, char *argv[]) {
                         continue;
                     }
                 }
-                if(cifra == '0' && !ii) {
+                if(cifra == '0' && ii == 0) {
                     fputs("\rDa li zelite da izadjete? y/n", stdout);
                     while((cifra = getch()) != 'y' && cifra != 'n')
                         putchar('\a');
@@ -114,30 +120,44 @@ int main(int argc, char *argv[]) {
                             putchar('\a');
                     continue;
                 }
-                if(ii > 9) {
+                if(cifra < '0' || cifra > '9') {
+                    putchar('\a');
+                    continue;
+                }
+                if(ii == duzina_broja) {
                     putchar('\a');
                     continue;
                 }
                 putchar(broj[ii++] = cifra);
                 brise = false;
             }
-            putchar('|');
             broj[ii] = '\0';
-            kombinacija[trenutna_cifra++] = atoi(broj);
+            kombinacija[trenutna_cifra] = atoi(broj);
+            if(kombinacija[trenutna_cifra] < 0 || kombinacija[trenutna_cifra] > broj_znakova) {
+                putchar('\a');
+                goto CITAJ_ZNAK;
+            } else {
+                putchar('|');
+                trenutna_cifra++;
+            }
         }
         for(ii = 0; ii < broj_cifara; ii++)
             if(kombinacija[ii] == tacna_kombinacija[ii]) {
                 na_mestu++;
-                preskoci1[ii] = preskoci2[ii] = true;
+                kombinacija[ii] = PRESKOCI;
+                preskoci[ii] = true;
                 putchar(na_mestu_znak);
             }
-        for(ii = 0; ii < broj_cifara; ii++)
-            for(iii = 0; iii < broj_cifara; iii++)
-                if(kombinacija[ii] == tacna_kombinacija[iii] && !preskoci1[ii] && !preskoci2[iii]) {
-                    na_pogresnom_mestu++;
-                    preskoci1[ii] = preskoci2[iii] = true;
-                    putchar(na_pogresnom_mestu_znak);
-                }
+        if(na_mestu != broj_cifara)
+           for(ii = 0; ii < broj_cifara; ii++)
+                for(iii = 0; iii < broj_cifara; iii++)
+                    if(kombinacija[ii] != PRESKOCI && !preskoci[iii] && kombinacija[ii] == tacna_kombinacija[iii]) {
+                        na_pogresnom_mestu++;
+                        kombinacija[ii] = PRESKOCI;
+                        preskoci[iii] = true;
+                        putchar(na_pogresnom_mestu_znak);
+                        break;
+                    }
         if(!tesko)
             na_mestu += na_pogresnom_mestu;
         if(na_mestu == broj_cifara) {
@@ -153,8 +173,7 @@ int main(int argc, char *argv[]) {
     KRAJ:
     free(kombinacija);
     free(tacna_kombinacija);
-    free(preskoci1);
-    free(preskoci2);
+    free(preskoci);
     getch();
     return 0;
 }
